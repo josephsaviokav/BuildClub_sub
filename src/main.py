@@ -1,24 +1,23 @@
-# Posterization (Cartoonization) of Portraits
-# This script applies a posterization effect to images
+
 
 import cv2
 import numpy as np
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-# Step 1: Read an image
-# You can use any image file (selfie, celebrity photo, etc.)
-image_path = "../assets/tom.jpg"  # Path to image in assets folder
+# reading the image from the assets folder
+
+image_path = "../assets/tom.jpg" 
 image = cv2.imread(image_path)
 
-# Step 2: Convert BGR to RGB for matplotlib display
+#  converting BGR to RGB for matplotlib display
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-# Step 3: Apply median blur for smooth output
+# applying median blur for smooth output
 image_blurred = cv2.medianBlur(image_rgb, 5)
 
-# Display original and blurred images
+#displaying the original and blurred images
 plt.figure(figsize=(12, 4))
 plt.subplot(1, 2, 1)
 plt.imshow(image_rgb)
@@ -31,27 +30,27 @@ plt.title('Blurred Image')
 plt.axis('off')
 plt.tight_layout()
 plt.savefig('step1_original_blurred.png')
-plt.close()  # Close instead of show
+plt.close()  #closing instead of showing
 
-# Step 4: Create a Look-Up Table (LUT) for posterization
-# n = number of levels to quantize colors to
-n = 5  # You can change this value
+#creating a Look-Up Table (LUT) for posterization
+# n = number of levels I want to quantize colors to
+n = 5  #  change this value
 
-# Create LUT that maps 0-255 to n evenly spaced values
+#creating a LUT that maps 0-255 to n evenly spaced values
 lut = np.zeros(256, dtype=np.uint8)
 for i in range(256):
-    # Map pixel value i to nearest quantized level
-    level = int((i / 255) * (n - 1))  # Determine which level (0 to n-1)
-    lut[i] = int((level / (n - 1)) * 255)  # Map back to 0-255 range
+    #mapping pixel value i to nearest quantized level
+    level = int((i / 255) * (n - 1))  #determining which level (0 to n-1)
+    lut[i] = int((level / (n - 1)) * 255)  #mapping back to 0-255 range
 
 print("Look-Up Table (LUT) for n =", n)
 print(lut)
 
-# Step 5: Apply LUT to each channel of the image
-# For color images, we need to apply LUT to each BGR channel separately
+#applying the LUT to each channel of the image
+# For color images, I need to apply LUT to each BGR channel separately
 image_posterized = cv2.LUT(image_blurred, lut)
 
-# Step 6: Display original and posterized images side-by-side
+#displaying the original and posterized images side-by-side
 plt.figure(figsize=(14, 6))
 
 plt.subplot(1, 2, 1)
@@ -66,9 +65,9 @@ plt.axis('off')
 
 plt.tight_layout()
 plt.savefig(f'posterization_result_n={n}.png')
-plt.close()  # Close instead of show
+plt.close()  #closing instead of showing
 
-# Optional: Try different posterization levels
+#trying different posterization levels
 print("\nGenerating posterization with different levels...")
 fig, axes = plt.subplots(2, 3, figsize=(15, 10))
 
@@ -89,13 +88,13 @@ for idx, n_level in enumerate(levels):
 
 plt.tight_layout()
 plt.savefig('posterization_comparison.png')
-plt.close()  # Close instead of show
+plt.close()  #closing instead of showing
 
-# Optional: Try color space transformation (HSV) for striking effects
+#trying color space transformation (HSV) for striking effects
 print("\nApplying color space transformation...")
 image_hsv = cv2.cvtColor(image_blurred, cv2.COLOR_RGB2HSV)
 
-# Posterize only the Saturation and Value channels
+#posterizing only the Saturation and Value channels
 s_channel = image_hsv[:, :, 1]
 v_channel = image_hsv[:, :, 2]
 
@@ -106,12 +105,12 @@ for i in range(256):
     lut_color[i] = int((level / (n_color - 1)) * 255)
 
 image_hsv_posterized = image_hsv.copy()
-image_hsv_posterized[:, :, 1] = cv2.LUT(s_channel, lut_color)  # Posterize Saturation
-image_hsv_posterized[:, :, 2] = cv2.LUT(v_channel, lut_color)  # Posterize Value
+image_hsv_posterized[:, :, 1] = cv2.LUT(s_channel, lut_color)  #posterizing Saturation
+image_hsv_posterized[:, :, 2] = cv2.LUT(v_channel, lut_color)  #posterizing Value
 
 image_hsv_posterized_rgb = cv2.cvtColor(image_hsv_posterized, cv2.COLOR_HSV2RGB)
 
-# Display HSV posterization result
+#displaying the HSV posterization result
 plt.figure(figsize=(14, 6))
 
 plt.subplot(1, 2, 1)
@@ -126,7 +125,7 @@ plt.axis('off')
 
 plt.tight_layout()
 plt.savefig('posterization_hsv.png')
-plt.close()  # Close instead of show
+plt.close()  #closing instead of showing
 
 print("\nPosterization complete!")
 print(f"Images saved:")
